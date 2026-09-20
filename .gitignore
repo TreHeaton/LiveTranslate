@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+
+# Environment variables / secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# PyCharm
+.idea/
+
+# Audio recordings
+*.wav
+*.m4a
+*.mp3
+
+# AI model/cache files
+.cache/
+huggingface/
+
+# OS files
+.DS_Store
+Thumbs.db
