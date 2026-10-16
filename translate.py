@@ -1,10 +1,35 @@
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+
 MODEL_NAME = "facebook/nllb-200-distilled-600M"
 
 SOURCE_LANGUAGE = "eng_Latn"
-TARGET_LANGUAGE = "jpn_Jpan"
+
+LANGUAGES = {
+    "1": {
+        "name": "Japanese",
+        "code": "jpn_Jpan"
+    },
+    "2": {
+        "name": "Spanish",
+        "code": "spa_Latn"
+    },
+    "3": {
+        "name": "French",
+        "code": "fra_Latn"
+    },
+    "4": {
+        "name": "German",
+        "code": "deu_Latn"
+    },
+    "5": {
+        "name": "Korean",
+        "code": "kor_Hang"
+    }
+}
 
 
 print("Loading translation model...")
@@ -17,7 +42,7 @@ tokenizer = AutoTokenizer.from_pretrained(
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
 
-def translate_to_japanese(text):
+def translate_text(text, target_language_code):
     inputs = tokenizer(
         text,
         return_tensors="pt",
@@ -28,7 +53,7 @@ def translate_to_japanese(text):
     translated_tokens = model.generate(
         **inputs,
         forced_bos_token_id=tokenizer.convert_tokens_to_ids(
-            TARGET_LANGUAGE
+            target_language_code
         ),
         max_new_tokens=128
     )
@@ -39,5 +64,4 @@ def translate_to_japanese(text):
     )[0]
 
     return translated_text
-
 

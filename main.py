@@ -1,5 +1,26 @@
 from speech import speech_to_text
-from translate import translate_to_japanese
+from translate import translate_text, LANGUAGES
+
+
+def display_language_menu():
+    print()
+    print("Select target language:")
+    print()
+
+    for number, language in LANGUAGES.items():
+        print(f"{number}. {language['name']}")
+
+    print()
+
+
+def get_language_choice():
+    while True:
+        choice = input("Enter choice: ")
+
+        if choice in LANGUAGES:
+            return LANGUAGES[choice]
+
+        print("Invalid choice. Please select a number from the menu.")
 
 
 def main():
@@ -7,20 +28,30 @@ def main():
     print("       LiveTranslate")
     print("================================")
 
+    display_language_menu()
+
+    selected_language = get_language_choice()
+
+    print()
+    print(f"Target language: {selected_language['name']}")
+
     audio_file = "Testaudiophone.m4a"
 
-    # Convert the audio recording into English text
+    print()
+
     text = speech_to_text(audio_file)
 
     print()
     print("Original:")
     print(text)
 
-    # Translate the English text into Japanese
-    translated_text = translate_to_japanese(text)
+    translated_text = translate_text(
+        text,
+        selected_language["code"]
+    )
 
     print()
-    print("Japanese:")
+    print(f"{selected_language['name']}:")
     print(translated_text)
 
 
