@@ -1,10 +1,9 @@
+
 from faster_whisper import WhisperModel
 
-
-# Load the speech recognition model.
-# "small" provides a good balance between accuracy and performance.
+# Smaller model for faster CPU transcription
 model = WhisperModel(
-    "small",
+    "base",
     device="cpu",
     compute_type="int8"
 )
@@ -13,7 +12,10 @@ model = WhisperModel(
 def speech_to_text(audio_file):
     print("Transcribing audio locally...")
 
-    segments, info = model.transcribe(audio_file)
+    segments, info = model.transcribe(
+        audio_file,
+        beam_size=1
+    )
 
     text = ""
 
