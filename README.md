@@ -1,295 +1,112 @@
-# LiveTranslate
+LiveTranslate
+Offline speech recognition and multilingual subtitles, built with Python.
+LiveTranslate is a personal software engineering project that listens to spoken English, transcribes it locally, translates the recognized text into a selected language, and displays the latest English and translated subtitles in a desktop window.
+The project is currently a Windows desktop prototype (v0.7). Android support and smart-glasses integration are planned, not yet implemented.
+Features
+- Continuous microphone listening with energy-based silence detection and speech segmentation
+- Local English speech recognition using Faster-Whisper with NVIDIA GPU acceleration
+- Local machine translation using Meta's NLLB-200 distilled 600M model
+- Five translation targets: Japanese, Spanish, French, German, and Korean
+- Live subtitle window built with Tkinter, displaying the latest recognized English text and its translation
+- Background processing using threads and queues to keep microphone capture and the user interface responsive
+- Performance measurements for transcription, translation, and processing delay in the terminal-based workflow
+- No paid translation or speech API required; models can run locally after their initial download
+How it works
+Microphone (English speech)
+          |
+          v
+Energy-based silence detection
+          |
+          v
+Audio segment queue
+          |
+          v
+Faster-Whisper (NVIDIA GPU)
+          |
+          v
+English transcription
+          |
+          v
+NLLB-200 translation (CPU)
+          |
+          v
+Subtitle queue
+          |
+          v
+Tkinter window: English + translated text
+The current implementation updates subtitles sentence by sentence after a pause, rather than word by word. Latency varies with sentence length and hardware.
+Tech stack
+- Python
+- Faster-Whisper / CTranslate2
+- Hugging Face Transformers and PyTorch
+- facebook/nllb-200-distilled-600M
+- NumPy, SoundDevice, SciPy
+- Tkinter
+- Threading and thread-safe queues
+Getting started
+Requirements
+- Windows computer with a working microphone
+- Python and a virtual environment
+- Dependencies listed in requirements.txt
+- NVIDIA GPU and compatible CUDA/cuDNN runtime for the current GPU-configured speech.py
+- Internet access for the initial model downloads; subsequent inference can run locally with cached models
+Hardware note: The current code uses a configured microphone device ID and initializes Faster-Whisper on CUDA. You may need to adjust DEVICE_ID in live_translate.py and the model/device settings in speech.py for your own computer.
 
-LiveTranslate is a real-time speech translation project designed to eventually
-provide translated subtitles through smart glasses.
-
-## Current Features
-
-- Local speech-to-text using Faster Whisper
-- Local machine translation using NLLB-200
-- English speech transcription
-- English-to-Japanese translation
-- Offline AI inference with no paid API required
-
-## Current Pipeline
-
-Audio Input
-→ Faster Whisper
-→ English Transcription
-→ NLLB-200
-→ Translated Text
-
-# LiveTranslate
-
-**An offline AI-powered speech recognition and multilingual translation application built with Python.**
-
-LiveTranslate is a personal software development project focused on converting spoken language into translated text. The long-term goal is to develop a real-time translation system that can connect to smart glasses and display subtitles during conversations.
-
-The project currently uses Faster Whisper for speech recognition and Meta's NLLB-200 model for multilingual translation.
-
-## Current Version: v0.2
-
-LiveTranslate currently supports:
-
-- Offline speech recognition using Faster Whisper
-- English speech transcription from recorded audio files
-- Translation into five languages
-- Local AI model inference without paid API calls
-- Command-line language selection
-- Performance benchmarking for transcription and translation
-- CPU inference with quantization for improved efficiency
-- Initial NVIDIA CUDA compatibility testing
-
-**Current limitation:** LiveTranslate processes prerecorded audio files. Continuous microphone transcription, real-time subtitles, and smart glasses integration are planned but not yet implemented.
-
-## Supported Languages
-
-| Language | NLLB Language Code |
-|---|---|
-| Japanese | `jpn_Jpan` |
-| Spanish | `spa_Latn` |
-| French | `fra_Latn` |
-| German | `deu_Latn` |
-| Korean | `kor_Hang` |
-
-English is currently the source language for translation.
-
-## Technologies Used
-
-- **Python:** Core application development
-- **Faster Whisper:** Speech-to-text transcription
-- **CTranslate2:** Optimized inference backend for Faster Whisper
-- **Hugging Face Transformers:** Translation model integration
-- **Meta NLLB-200 Distilled 600M:** Multilingual neural machine translation
-- **PyTorch:** Translation model execution
-- **Git and GitHub:** Version control
-- **PyCharm:** Development environment
-
-The application uses locally downloaded AI models instead of requiring a paid cloud transcription or translation API.
-
-An internet connection is required for the initial model downloads.
-
-## How LiveTranslate Works
-
-1. The user launches the application.
-2. LiveTranslate displays a menu of supported languages.
-3. The user selects a target language.
-4. Faster Whisper processes a prerecorded audio file and produces an English transcription.
-5. NLLB-200 translates the transcription into the selected language.
-6. The application displays the original transcription, translated text, and processing times.
-
-### Project Structure
-
-```text
-LiveTranslate/
-├── main.py
-├── speech.py
-├── translate.py
-├── audio.py
-├── requirements.txt
-├── README.md
-└── .gitignore
-```
-
-**main.py:** Controls the application workflow, language selection, and performance measurements.
-
-**speech.py:** Handles local speech recognition using Faster Whisper.
-
-**translate.py:** Loads the NLLB translation model and translates text into the selected language.
-
-**audio.py:** Contains experimental audio-recording functionality for future microphone support.
-
-## Installation and Setup
-
-### Prerequisites
-
-- Python and pip
-- Git (optional)
-- Sufficient storage for downloaded AI models
-- Windows, Linux, or macOS with compatible dependencies
-
-This project is currently developed and tested on Windows using Python 3.14.7. Compatibility with other environments has not yet been fully verified.
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/TreHeaton/LiveTranslate.git
-cd LiveTranslate
-```
-
-### Create a Virtual Environment
-
-```bash
+Install
+From the project directory in PowerShell:
 python -m venv .venv
-```
-
-Activate it on Windows PowerShell:
-
-```powershell
 .\.venv\Scripts\Activate.ps1
-```
-
-### Install Dependencies
-
-```bash
 pip install -r requirements.txt
-```
+Model downloads may take time on the first run. Make sure your CUDA and cuDNN libraries are correctly installed and available if using the current GPU configuration.
+Run the live subtitle application
+python live_subtitles.py
+1. Choose a target language by entering a number from 1 to 5 in the terminal.
+2. Wait for the subtitle window and microphone to start.
+3. Speak English and pause briefly between sentences.
+4. Read the original text and translated subtitle in the window.
+5. Close the window to stop the session.
+Run the terminal-only translator
+python live_translate.py
+This version also prints separate speech recognition and translation timings.
+Preview the subtitle window without a microphone
+python subtitle_window.py
+This launches a demo with sample text, not live audio.
+Project files
+File	Purpose
+live_subtitles.py	Connects microphone capture, transcription, translation, and the live subtitle window
+subtitle_window.py	Tkinter subtitle interface and standalone UI demo
+live_translate.py	Continuous microphone recording, silence detection, and terminal-based translation
+speech.py	English speech recognition using Faster-Whisper
+translate.py	NLLB translation into the selected language
+microphone.py	Microphone testing utility
+main.py	Earlier audio-file translation workflow
 
-The dependency file should be kept synchronized with the packages installed in the development environment.
 
-### Provide Test Audio
+Development progress
+Version	Milestone	Status
+v0.1–v0.3	Local speech recognition and translation; continuous microphone prototype	Complete
+v0.4	Silence-based speech segmentation	Complete
+v0.5	Processing and queue-delay measurements	Complete
+v0.6	CPU translation inference adjustments	Complete
+v0.7	Live desktop subtitle window	Complete
+v0.8	Android application prototype	Planned
+Future	Compatible smart-glasses subtitle output	Planned
 
-Place a supported audio recording in the project directory.
 
-The current `main.py` expects an audio file named:
-
-```text
-Testaudiophone.m4a
-```
-
-You can modify the `audio_file` variable in `main.py` to use another filename.
-
-Test audio is excluded from version control.
-
-### Run LiveTranslate
-
-```bash
-python main.py
-```
-
-Select a language from the displayed menu.
-
-The application will transcribe the recording, translate the text, and display the results.
-
-## Performance Optimization
-
-During v0.2 development, performance measurements were added to identify bottlenecks in the speech recognition and translation pipeline.
-
-### Benchmark Results
-
-Testing was performed on a desktop computer with:
-
-- AMD Ryzen 5 2400G, 4 cores and 8 threads
-- NVIDIA GeForce GTX 1660, 6 GB VRAM
-- Windows and Python 3.14.7
-
-| Component | Initial CPU Test | Optimized CPU Test |
-|---|---:|---:|
-| Speech recognition | 10.78 seconds | 3.04 seconds |
-| Translation | 16.48 seconds | 3.48 seconds |
-| Total processing | 27.25 seconds | 6.52 seconds |
-
-**Observed improvement:** Approximately 76% reduction in total processing time between the two tests.
-
-Changes to speech recognition included:
-
-- Switching from Whisper `small` to `base`
-- Using INT8 CPU inference
-- Setting beam size to 1
-
-The translation model remained unchanged between these tests. Its observed speed improvement may reflect system load, warm-up effects, or other runtime differences.
-
-These are preliminary single-run benchmarks, not controlled averages. Model loading and application startup are excluded from the processing measurements.
-
-Smaller models and simpler decoding can improve performance but may reduce transcription accuracy.
-
-## GPU Acceleration: In Progress
-
-The project is being evaluated for NVIDIA CUDA acceleration using a GTX 1660.
-
-Initial tests confirmed that:
-
-- The NVIDIA GPU is detected by CTranslate2.
-- Faster Whisper can load a model configured for CUDA.
-- Actual GPU transcription requires additional CUDA runtime dependencies.
-
-GPU inference has not yet been successfully benchmarked.
-
-The working implementation currently uses CPU inference.
-
-## Development Roadmap
-
-### v0.1: Initial Prototype
-- [x] Implement local speech recognition
-- [x] Integrate NLLB-200 translation
-- [x] Translate recorded English speech into Japanese
-- [x] Configure local model caching
-- [x] Create GitHub repository
-
-### v0.2: Multilingual Support and Optimization
-- [x] Add five target languages
-- [x] Implement command-line language selection
-- [x] Add transcription and translation timing
-- [x] Test smaller Whisper models
-- [x] Benchmark CPU performance
-- [ ] Complete GPU acceleration testing
-- [ ] Add automated tests and error handling
-
-### v0.3: Continuous Audio Processing
-- [ ] Add microphone input
-- [ ] Process shorter audio segments
-- [ ] Support continuous transcription
-- [ ] Reduce end-to-end translation latency
-
-### v0.4: Backend API
-- [ ] Create an API for transcription and translation
-- [ ] Add structured requests and responses
-- [ ] Investigate streaming communication
-
-### v0.5: User Interface
-- [ ] Develop a web interface
-- [ ] Display original and translated subtitles
-- [ ] Add language selection controls
-
-### v0.6 and Beyond: Mobile and Wearable Integration
-- [ ] Investigate Android application development
-- [ ] Connect mobile microphone input
-- [ ] Explore compatible smart glasses
-- [ ] Display translated subtitles on wearable devices
-
-## Potential Applications
-
-LiveTranslate is being developed with several possible applications in mind:
-
-- Travel and international communication
-- Language learning
-- Accessibility and translated captions
-- Multilingual customer support
-- Healthcare communication assistance
-
-Healthcare use would require substantial additional work involving translation accuracy, privacy, reliability, and appropriate human oversight. This prototype is not intended to replace qualified medical interpreters or support safety-critical clinical decisions.
-
-## What I've Learned
-
-Developing LiveTranslate has provided practical experience with:
-
-- Building modular Python applications
-- Integrating open-source machine learning models
-- Running AI inference locally
-- Managing Python virtual environments and dependencies
-- Troubleshooting API limitations and library compatibility
-- Configuring model storage and caching
-- Using Git and GitHub for version control
-- Measuring software performance
-- Evaluating CPU and GPU acceleration
-- Balancing speed, accuracy, and resource requirements
-
-## Future Goals
-
-The long-term objective is to turn LiveTranslate into a practical, low-latency translation application that can display translated subtitles during conversations.
-
-Future development will focus on real-time audio processing, application architecture, user interfaces, mobile compatibility, and smart glasses integration.
-
-## Author
-
-**Tre Heaton**
-
-Computer Science Student | Software Engineering
-
-GitHub: https://github.com/TreHeaton
-
-## Project Status
-
-**Active Development | Version 0.2**
-
-LiveTranslate is an educational and portfolio project. Features, performance, and supported platforms may change as development continues.
+Known limitations
+- The current application is a desktop prototype, not an Android app.
+- The default microphone device ID is machine-specific.
+- GPU speech recognition requires compatible NVIDIA/CUDA/cuDNN setup as currently configured.
+- Speech segmentation uses audio volume thresholds and can split sentences or react to background noise.
+- Subtitles appear after a completed speech segment and processing delay; they are not word-level streaming captions.
+- Translation accuracy varies with language, phrasing, and speech recognition quality.
+- The subtitle window currently displays the latest translated segment rather than a full conversation history.
+Roadmap
+- Build an Android UI with language selection, microphone controls, and subtitles
+- Evaluate smaller, mobile-compatible offline speech and translation models
+- Improve segmentation, subtitle timing, and translation accuracy
+- Explore supported display-glasses connections for wearable subtitles
+Motivation
+LiveTranslate is an independent learning and portfolio project focused on practical AI integration, concurrency, performance measurement, and accessible multilingual communication. The long-term goal is to make translated speech easier to follow on mobile devices and, eventually, compatible wearable displays.
+License
+No license has been specified yet. Check the repository for any future licensing information. Third-party models and libraries are subject to their respective licenses and terms.
