@@ -1,16 +1,16 @@
 
 from faster_whisper import WhisperModel
 
-# Smaller model for faster CPU transcription
+# Load Faster Whisper using NVIDIA GPU acceleration
 model = WhisperModel(
     "base",
-    device="cpu",
-    compute_type="int8"
+    device="cuda",
+    compute_type="float16"
 )
 
 
 def speech_to_text(audio_file):
-    print("Transcribing audio locally...")
+    print("Transcribing audio using NVIDIA GPU...")
 
     segments, info = model.transcribe(
         audio_file,

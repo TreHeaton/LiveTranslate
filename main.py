@@ -41,7 +41,7 @@ def main():
     print(f"Target language: {selected_language['name']}")
 
     # Audio file used for testing
-    audio_file = "Testaudiophone.m4a"
+    audio_file = "Audiotestphone.m4a"
 
     print()
 

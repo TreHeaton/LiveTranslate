@@ -1,8 +1,17 @@
+
+import os
+
+# Configure CPU threading before importing PyTorch
+os.environ.setdefault("OMP_NUM_THREADS", "4")
+
+import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
+# ==========================================
+# LiveTranslate v0.6
+# Optimized CPU Translation
+# ==========================================
 
 MODEL_NAME = "facebook/nllb-200-distilled-600M"
 
@@ -32,6 +41,9 @@ LANGUAGES = {
 }
 
 
+# Use four CPU threads as an initial benchmark
+torch.set_num_threads(4)
+
 print("Loading translation model...")
 
 tokenizer = AutoTokenizer.from_pretrained(
@@ -39,29 +51,48 @@ tokenizer = AutoTokenizer.from_pretrained(
     src_lang=SOURCE_LANGUAGE
 )
 
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
+model = AutoModelForSeq2SeqLM.from_pretrained(
+    MODEL_NAME
+)
+
+# Put the model in inference mode
+model.eval()
+
+print("Translation model ready.")
 
 
+@torch.inference_mode()
 def translate_text(text, target_language_code):
+    """Translate English text using the NLLB model."""
+
+    if not text or not text.strip():
+        return ""
+
+    # Convert input text into model tokens
     inputs = tokenizer(
         text,
         return_tensors="pt",
-        padding=True,
         truncation=True
     )
 
-    translated_tokens = model.generate(
-        **inputs,
-        forced_bos_token_id=tokenizer.convert_tokens_to_ids(
-            target_language_code
-        ),
-        max_new_tokens=128
+    # Identify the requested output language
+    language_token_id = tokenizer.convert_tokens_to_ids(
+        target_language_code
     )
 
+    # Generate the translation
+    translated_tokens = model.generate(
+        **inputs,
+        forced_bos_token_id=language_token_id,
+        max_new_tokens=64,
+        num_beams=1,
+        do_sample=False
+    )
+
+    # Convert tokens back into readable text
     translated_text = tokenizer.batch_decode(
         translated_tokens,
         skip_special_tokens=True
     )[0]
 
     return translated_text
-
